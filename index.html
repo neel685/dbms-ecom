@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DBMS Project Website</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -196,9 +195,6 @@
                 <a href="#returns" class="sidebar-link flex items-center px-4 py-2 rounded-lg hover:bg-process-flow transition-colors" data-target="returns">
                     <span class="mr-3">🔁</span> Returns & Support
                 </a>
-                <a href="#analytics" class="sidebar-link flex items-center px-4 py-2 rounded-lg hover:bg-process-flow transition-colors" data-target="analytics">
-                    <span class="mr-3">📊</span> Analytics & Comms
-                </a>
             </nav>
             <div class="p-4 border-t border-color">
                 <p class="text-xs text-tertiary mt-4 text-center">&copy; 2025 Neel Mandal</p>
@@ -209,11 +205,11 @@
             
             <section id="overview" class="content-section">
                 <h2 class="text-primary text-3xl md:text-4xl font-bold mb-4">System Architecture Overview</h2>
-                <p class="text-secondary text-base mb-8">This application provides an interactive guide to the E-Commerce Fulfillment, Logistics, and Returns database schema. Use the sidebar to navigate through the core modules of the system. Each section explains the purpose of its tables and visualizes their relationships.</p>
+                <p class="text-secondary text-base mb-8">This application provides an interactive guide to the E-Commerce Management System database schema. Use the sidebar to navigate through the core modules of the system. Each section explains the purpose of its tables and visualizes their relationships.</p>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-12">
                     <div class="bg-secondary p-4 sm:p-6 rounded-xl shadow-sm text-center border border-color">
-                        <p class="text-3xl sm:text-4xl font-bold accent-main">29</p>
+                        <p class="text-3xl sm:text-4xl font-bold accent-main">13</p>
                         <p class="text-tertiary font-medium text-sm sm:text-base">Total Tables</p>
                     </div>
                     <div class="bg-secondary p-4 sm:p-6 rounded-xl shadow-sm text-center border border-color">
@@ -221,7 +217,7 @@
                         <p class="text-tertiary font-medium text-sm sm:text-base">Core Modules</p>
                     </div>
                     <div class="bg-secondary p-4 sm:p-6 rounded-xl shadow-sm text-center border border-color">
-                        <p class="text-3xl sm:text-4xl font-bold accent-main">35+</p>
+                        <p class="text-3xl sm:text-4xl font-bold accent-main">19</p>
                         <p class="text-tertiary font-medium text-sm sm:text-base">Key Relationships</p>
                     </div>
                 </div>
@@ -257,7 +253,7 @@
                 
                 <div class="flex flex-col items-center space-y-8 mb-8">
                     <div class="bg-secondary p-4 rounded-xl shadow-sm w-full max-w-4xl border border-color light-mode-er-diagram">
-                        <img src="er1.png" ER Diagram 1 (Light Mode)" class="w-full h-auto object-contain rounded-lg shadow-md border border-color">
+                        <img src="er1.png" alt="ER Diagram 1 (Light Mode)" class="w-full h-auto object-contain rounded-lg shadow-md border border-color">
                     </div>
                     <div class="bg-secondary p-4 rounded-xl shadow-sm w-full max-w-4xl border border-color light-mode-er-diagram">
                         <img src="er2.png" alt="ER Diagram 2 (Light Mode)" class="w-full h-auto object-contain rounded-lg shadow-md border border-color">
@@ -280,15 +276,11 @@
                 <h3 class="text-primary text-2xl md:text-3xl font-bold mb-4">Entities in this Module</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                     <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">Customer</h4>
-                        <p class="text-sm text-secondary">Stores customer personal and contact information.</p>
+                        <h4 class="font-bold text-lg accent-dark mb-2">Addresses</h4>
+                        <p class="text-sm text-secondary">Centralized storage for all unique address information.</p>
                         <div class="attributes mt-3 text-primary text-sm">
                             <ul class="list-disc pl-5 space-y-1">
-                                <li>customer_id (PK)</li>
-                                <li>first_name</li>
-                                <li>last_name</li>
-                                <li>email (Unique)</li>
-                                <li>phone_number</li>
+                                <li>address_id (PK)</li>
                                 <li>address_line1</li>
                                 <li>address_line2 (nullable)</li>
                                 <li>city</li>
@@ -301,21 +293,32 @@
                         </div>
                     </div>
                     <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">Customer</h4>
+                        <p class="text-sm text-secondary">Stores customer personal and contact information.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>customer_id (PK)</li>
+                                <li>first_name</li>
+                                <li>last_name</li>
+                                <li>email (Unique)</li>
+                                <li>phone_number</li>
+                                <li>address_id (FK)</li>
+                                <li>created_at</li>
+                                <li>updated_at</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
                         <h4 class="font-bold text-lg accent-dark mb-2">Order</h4>
                         <p class="text-sm text-secondary">Records details of each customer order.</p>
                         <div class="attributes mt-3 text-primary text-sm">
                             <ul class="list-disc pl-5 space-y-1">
                                 <li>order_id (PK)</li>
                                 <li>customer_id (FK)</li>
+                                <li>shipping_address_id (FK)</li>
                                 <li>order_status (<span class="font-medium">Enum: Pending, Processing, Shipped, Delivered, Cancelled</span>)</li>
                                 <li>order_datetime</li>
                                 <li>total_amount</li>
-                                <li>shipping_address_line1</li>
-                                <li>shipping_address_line2 (nullable)</li>
-                                <li>shipping_city</li>
-                                <li>shipping_state</li>
-                                <li>shipping_zip_code</li>
-                                <li>shipping_country</li>
                             </ul>
                         </div>
                     </div>
@@ -329,7 +332,9 @@
                                 <li>name</li>
                                 <li>category</li>
                                 <li>weight_kg</li>
-                                <li>dimensions_cm (<span class="font-medium">e.g., "10x15x5"</span>)</li>
+                                <li>length_cm</li>
+                                <li>width_cm</li>
+                                <li>height_cm</li>
                                 <li>description (nullable)</li>
                                 <li>created_at</li>
                                 <li>updated_at</li>
@@ -370,16 +375,22 @@
                 <div class="bg-secondary p-6 rounded-xl shadow-sm border border-color">
                     <ul class="list-disc pl-5 space-y-3 text-primary">
                         <li>
-                            <strong>Customer &harr; Order (One-to-Many):</strong> A Customer can place multiple Orders. This relationship (Customer.customer_id &rarr; Order.customer_id) is crucial for tracking customer purchase history and attributing orders to specific users.
+                            <strong>Customer &harr; Addresses (One-to-One/Many):</strong> A Customer has a billing/primary address. The `address_id` in `Customer` links to the `Addresses` table.
                         </li>
                         <li>
-                            <strong>Order &harr; OrderItem (One-to-Many):</strong> An Order can contain multiple OrderItems, each representing a distinct product and quantity. This relationship (Order.order_id &rarr; OrderItem.order_id) allows for a detailed breakdown of an order's contents.
+                            <strong>Order &harr; Addresses (One-to-One/Many):</strong> An Order has a shipping address. The `shipping_address_id` in `Order` links to the `Addresses` table.
                         </li>
                         <li>
-                            <strong>Product &harr; OrderItem (One-to-Many):</strong> A Product can appear in many OrderItems across different orders. This link (Product.product_id &rarr; OrderItem.product_id) enables tracking which products are sold in which orders.
+                            <strong>Customer &harr; Order (One-to-Many):</strong> A Customer can place multiple Orders.
                         </li>
                         <li>
-                            <strong>Order &harr; Payment (One-to-Many):</strong> An Order can have multiple Payment records (e.g., failed attempts, refunds linked to original payment). This relationship (Order.order_id &rarr; Payment.order_id) ensures comprehensive payment tracking for financial reconciliation.
+                            <strong>Order &harr; OrderItem (One-to-Many):</strong> An Order can contain multiple OrderItems.
+                        </li>
+                        <li>
+                            <strong>Product &harr; OrderItem (One-to-Many):</strong> A Product can appear in many OrderItems.
+                        </li>
+                        <li>
+                            <strong>Order &harr; Payment (One-to-Many):</strong> An Order can have multiple Payment records.
                         </li>
                     </ul>
                 </div>
@@ -387,7 +398,7 @@
 
             <section id="inventory" class="content-section">
                 <h2 class="text-primary text-3xl md:text-4xl font-bold mb-4">🏬 Warehouse & Inventory Module</h2>
-                <p class="text-secondary text-base mb-8">This module handles the physical storage locations, stock levels of products, and the procurement process for replenishing inventory.</p>
+                <p class="text-secondary text-base mb-8">This module handles the physical storage locations and stock levels of products.</p>
 
                 <h3 class="text-primary text-2xl md:text-3xl font-bold mb-4">Entities in this Module</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -398,11 +409,7 @@
                             <ul class="list-disc pl-5 space-y-1">
                                 <li>warehouse_id (PK)</li>
                                 <li>name</li>
-                                <li>location_address</li>
-                                <li>city</li>
-                                <li>state</li>
-                                <li>zip_code</li>
-                                <li>country</li>
+                                <li>address_id (FK)</li>
                                 <li>capacity_sqft</li>
                                 <li>contact_phone</li>
                                 <li>contact_email</li>
@@ -412,90 +419,16 @@
                         </div>
                     </div>
                     <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">WarehouseZone</h4>
-                        <p class="text-sm text-secondary">Defines specific zones within a warehouse.</p>
-                        <div class="attributes mt-3 text-primary text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>zone_id (PK)</li>
-                                <li>warehouse_id (FK)</li>
-                                <li>zone_name</li>
-                                <li>zone_type (<span class="font-medium">Enum: Aisle, Cold Storage, Bulk, Picking</span>)</li>
-                                <li>capacity_limit (nullable)</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
                         <h4 class="font-bold text-lg accent-dark mb-2">Inventory</h4>
                         <p class="text-sm text-secondary">Tracks real-time stock levels of products at each warehouse.</p>
                         <div class="attributes mt-3 text-primary text-sm">
                             <ul class="list-disc pl-5 space-y-1">
-                                <li>inventory_id (PK)</li>
-                                <li>warehouse_id (FK)</li>
-                                <li>product_id (FK)</li>
+                                <li>warehouse_id (PK, FK)</li>
+                                <li>product_id (PK, FK)</li>
                                 <li>quantity_on_hand</li>
                                 <li>min_stock_level</li>
                                 <li>max_stock_level</li>
                                 <li>last_updated</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">Supplier</h4>
-                        <p class="text-sm text-secondary">Information about product suppliers.</p>
-                        <div class="attributes mt-3 text-primary text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>supplier_id (PK)</li>
-                                <li>name</li>
-                                <li>contact_person</li>
-                                <li>contact_email</li>
-                                <li>contact_phone</li>
-                                <li>address</li>
-                                <li>created_at</li>
-                                <li>updated_at</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">ProcurementOrder</h4>
-                        <p class="text-sm text-secondary">Tracks orders placed with suppliers to replenish stock.</p>
-                        <div class="attributes mt-3 text-primary text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>procurement_order_id (PK)</li>
-                                <li>supplier_id (FK)</li>
-                                <li>warehouse_id (FK)</li>
-                                <li>order_date</li>
-                                <li>expected_delivery_date</li>
-                                <li>actual_delivery_date (nullable)</li>
-                                <li>status (<span class="font-medium">Enum: Pending, Ordered, Received, Cancelled</span>)</li>
-                                <li>total_cost</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">ProcurementOrderItem</h4>
-                        <p class="text-sm text-secondary">Individual items within a procurement order.</p>
-                        <div class="attributes mt-3 text-primary text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>procurement_order_item_id (PK)</li>
-                                <li>procurement_order_id (FK)</li>
-                                <li>product_id (FK)</li>
-                                <li>quantity</li>
-                                <li>unit_price</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">StockTransfer</h4>
-                        <p class="text-sm text-secondary">Records movement of stock between warehouses.</p>
-                        <div class="attributes mt-3 text-primary text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>transfer_id (PK)</li>
-                                <li>from_warehouse_id (FK)</li>
-                                <li>to_warehouse_id (FK)</li>
-                                <li>product_id (FK)</li>
-                                <li>quantity</li>
-                                <li>transfer_datetime</li>
-                                <li>status (<span class="font-medium">Enum: In Transit, Completed, Cancelled</span>)</li>
                             </ul>
                         </div>
                     </div>
@@ -505,31 +438,13 @@
                 <div class="bg-secondary p-6 rounded-xl shadow-sm border border-color">
                     <ul class="list-disc pl-5 space-y-3 text-primary">
                         <li>
-                            <strong>Warehouse &harr; WarehouseZone (One-to-Many):</strong> A Warehouse can have multiple defined WarehouseZones, enabling granular organization of storage space within each facility.
+                            <strong>Warehouse &harr; Addresses (One-to-One):</strong> A Warehouse has one primary address. The `address_id` in `Warehouse` links to the `Addresses` table.
                         </li>
                         <li>
-                            <strong>Warehouse &harr; Inventory (One-to-Many):</strong> A Warehouse holds Inventory for many different Products. This relationship, often using a composite key of warehouse_id and product_id, ensures unique stock tracking per product per warehouse.
+                            <strong>Warehouse &harr; Inventory (One-to-Many):</strong> A Warehouse holds Inventory for many different Products.
                         </li>
                         <li>
-                            <strong>Product &harr; Inventory (One-to-Many):</strong> A Product's Inventory levels are tracked across various Warehouse locations. This allows for distributed inventory management.
-                        </li>
-                        <li>
-                            <strong>Supplier &harr; ProcurementOrder (One-to-Many):</strong> A Supplier can receive multiple ProcurementOrders from the company, enabling tracking of all inbound stock orders from various vendors.
-                        </li>
-                        <li>
-                            <strong>Warehouse &harr; ProcurementOrder (One-to-Many):</strong> Each ProcurementOrder is directed to a specific Warehouse to replenish its stock, linking procurement activities directly to inventory destinations.
-                        </li>
-                        <li>
-                            <strong>ProcurementOrder &harr; ProcurementOrderItem (One-to-Many):</strong> A ProcurementOrder comprises several ProcurementOrderItems, detailing the specific products and quantities ordered from the supplier.
-                        </li>
-                        <li>
-                            <strong>Product &harr; ProcurementOrderItem (One-to-Many):</strong> A Product can be part of many ProcurementOrderItems across different procurement orders, allowing for tracking product demand from suppliers.
-                        </li>
-                        <li>
-                            <strong>Warehouse &harr; StockTransfer (One-to-Many on both 'from' and 'to'):</strong> The StockTransfer table records movement of products *from* one Warehouse and *to* another, which is vital for managing inter-warehouse logistics and inventory balancing.
-                        </li>
-                        <li>
-                            <strong>Product &harr; StockTransfer (One-to-Many):</strong> A Product can be the item being moved in many StockTransfer operations, providing traceability of product movements between warehouses.
+                            <strong>Product &harr; Inventory (One-to-Many):</strong> A Product's Inventory levels are tracked across various Warehouse locations.
                         </li>
                     </ul>
                 </div>
@@ -537,7 +452,7 @@
 
             <section id="logistics" class="content-section">
                 <h2 class="text-primary text-3xl md:text-4xl font-bold mb-4">🚚 Logistics & Delivery Module</h2>
-                <p class="text-secondary text-base mb-8">This module orchestrates the delivery process, from assigning agents and vehicles to managing routes, shipments, and individual packages.</p>
+                <p class="text-secondary text-base mb-8">This module orchestrates the delivery process, from assigning agents to managing shipments and individual packages.</p>
 
                 <h3 class="text-primary text-2xl md:text-3xl font-bold mb-4">Entities in this Module</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -557,63 +472,13 @@
                         </div>
                     </div>
                     <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">Vehicle</h4>
-                        <p class="text-sm text-secondary">Information about delivery vehicles.</p>
-                        <div class="attributes mt-3 text-primary text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>vehicle_id (PK)</li>
-                                <li>agent_id (FK, nullable)</li>
-                                <li>license_plate (Unique)</li>
-                                <li>type (<span class="font-medium">Enum: Bike, Van, Truck</span>)</li>
-                                <li>capacity_kg</li>
-                                <li>status (<span class="font-medium">Enum: Available, In Use, Maintenance</span>)</li>
-                                <li>last_service_date</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">Route</h4>
-                        <p class="text-sm text-secondary">Defines planned delivery routes.</p>
-                        <div class="attributes mt-3 text-primary text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>route_id (PK)</li>
-                                <li>delivery_date</li>
-                                <li>start_location</li>
-                                <li>end_location</li>
-                                <li>area_code</li>
-                                <li>route_status (<span class="font-medium">Enum: Planned, In Progress, Completed, Cancelled</span>)</li>
-                                <li>created_at</li>
-                                <li>updated_at</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">RouteStop</h4>
-                        <p class="text-sm text-secondary">Individual stops on a delivery route.</p>
-                        <div class="attributes mt-3 text-primary text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>stop_id (PK)</li>
-                                <li>route_id (FK)</li>
-                                <li>stop_sequence</li>
-                                <li>location_address</li>
-                                <li>city</li>
-                                <li>state</li>
-                                <li>zip_code</li>
-                                <li>estimated_arrival_time</li>
-                                <li>actual_arrival_time (nullable)</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
                         <h4 class="font-bold text-lg accent-dark mb-2">Shipment</h4>
                         <p class="text-sm text-secondary">Represents a single delivery trip carrying one or more packages.</p>
                         <div class="attributes mt-3 text-primary text-sm">
                             <ul class="list-disc pl-5 space-y-1">
                                 <li>shipment_id (PK)</li>
-                                <li>route_id (FK, nullable)</li>
                                 <li>delivery_agent_id (FK)</li>
                                 <li>warehouse_id (FK)</li>
-                                <li>vehicle_id (FK, nullable)</li>
                                 <li>shipment_datetime</li>
                                 <li>delivery_status (<span class="font-medium">Enum: Out for Delivery, Delivered, Attempted, Failed, Returned</span>)</li>
                                 <li>estimated_delivery_datetime</li>
@@ -632,24 +497,10 @@
                                 <li>tracking_number (Unique)</li>
                                 <li>package_status (<span class="font-medium">Enum: Packed, In Transit, Delivered, Damaged, Lost</span>)</li>
                                 <li>weight_kg</li>
-                                <li>dimensions_cm</li>
+                                <li>length_cm</li>
+                                <li>width_cm</li>
+                                <li>height_cm</li>
                                 <li>packed_date</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">TripLog</h4>
-                        <p class="text-sm text-secondary">Detailed logs of delivery agent trips.</p>
-                        <div class="attributes mt-3 text-primary text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>trip_log_id (PK)</li>
-                                <li>shipment_id (FK)</li>
-                                <li>start_time</li>
-                                <li>end_time</li>
-                                <li>start_location</li>
-                                <li>end_location</li>
-                                <li>distance_km</li>
-                                <li>notes (nullable)</li>
                             </ul>
                         </div>
                     </div>
@@ -659,31 +510,16 @@
                 <div class="bg-secondary p-6 rounded-xl shadow-sm border border-color">
                     <ul class="list-disc pl-5 space-y-3 text-primary">
                         <li>
-                            <strong>DeliveryAgent &harr; Vehicle (One-to-Many, optional):</strong> A DeliveryAgent can be assigned to a Vehicle. This relationship is nullable to allow for scenarios where vehicles are shared or agents use personal transport not tracked in this table.
+                            <strong>DeliveryAgent &harr; Shipment (One-to-Many):</strong> A DeliveryAgent can handle multiple Shipments.
                         </li>
                         <li>
-                            <strong>Route &harr; RouteStop (One-to-Many):</strong> A Route is composed of multiple ordered RouteStops, defining the precise sequence of locations a delivery agent must visit.
+                            <strong>Warehouse &harr; Shipment (One-to-Many):</strong> Each Shipment originates from a specific Warehouse.
                         </li>
                         <li>
-                            <strong>DeliveryAgent &harr; Shipment (One-to-Many):</strong> A DeliveryAgent can handle multiple Shipments, centralizing agent performance tracking and workload management.
+                            <strong>OrderItem &harr; Package (One-to-Many):</strong> Each OrderItem is prepared as a unique Package.
                         </li>
                         <li>
-                            <strong>Warehouse &harr; Shipment (One-to-Many):</strong> Each Shipment originates from a specific Warehouse, linking the physical inventory pickup to the delivery process.
-                        </li>
-                        <li>
-                            <strong>Vehicle &harr; Shipment (One-to-Many, optional):</strong> A Vehicle can be used for many Shipments. This is nullable if vehicle assignment isn't always tracked at the shipment level, or if agents use personal vehicles.
-                        </li>
-                        <li>
-                            <strong>Route &harr; Shipment (One-to-Many, optional):</strong> A Shipment can be part of a larger planned Route, or it might be a direct shipment not tied to a complex route.
-                        </li>
-                        <li>
-                            <strong>OrderItem &harr; Package (One-to-Many):</strong> Each OrderItem from a customer's order is prepared as a unique Package for physical handling and delivery. This is a critical link for tracing individual items.
-                        </li>
-                        <li>
-                            <strong>Shipment &harr; Package (One-to-Many, optional):</strong> A Shipment typically bundles multiple Packages together for a single delivery run. This relationship is nullable if a package is packed but not yet assigned to a shipment.
-                        </li>
-                        <li>
-                            <strong>Shipment &harr; TripLog (One-to-Many):</strong> A Shipment generates TripLog entries, recording detailed journey information such as start/end times and locations for route analysis and optimization.
+                            <strong>Shipment &harr; Package (One-to-Many, optional):</strong> A Shipment bundles multiple Packages.
                         </li>
                     </ul>
                 </div>
@@ -691,55 +527,29 @@
 
             <section id="returns" class="content-section">
                 <h2 class="text-primary text-3xl md:text-4xl font-bold mb-4">🔁 Returns & Support Module</h2>
-                <p class="text-secondary text-base mb-8">This module manages the entire lifecycle of product returns, including requests, pickups, inspections, refunds, and customer complaints and their resolutions.</p>
+                <p class="text-secondary text-base mb-8">This module manages the entire lifecycle of product returns, including requests, pickups, inspections, and refunds.</p>
 
                 <h3 class="text-primary text-2xl md:text-3xl font-bold mb-4">Entities in this Module</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                     <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
                         <h4 class="font-bold text-lg accent-dark mb-2">ReturnRequest</h4>
-                        <p class="text-sm text-secondary">Initial request from a customer to return an item.</p>
+                        <p class="text-sm text-secondary">Initial request from a customer to return an item, including pickup and inspection details.</p>
                         <div class="attributes mt-3 text-primary text-sm">
                             <ul class="list-disc pl-5 space-y-1">
                                 <li>return_request_id (PK)</li>
                                 <li>customer_id (FK)</li>
                                 <li>order_item_id (FK)</li>
                                 <li>request_date</li>
-                                <li>reason (<span class="font-medium">Enum: Damaged, Wrong Size, Not as Described, Changed Mind</span>)</li>
-                                <li>return_status (<span class="font-medium">Enum: Pending, Scheduled Pickup, Received, Inspected, Refunded, Rejected</span>)</li>
+                                <li>reason (<span class="font-medium">Enum: Damaged, Wrong Size, Not as Described, Changed Mind, Other</span>)</li>
+                                <li>return_status (<span class="font-medium">Enum: Pending, Scheduled Pickup, Received, Inspected, Refunded, Rejected, Picked Up, Failed Pickup</span>)</li>
                                 <li>pickup_scheduled_date (nullable)</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">ReturnPickup</h4>
-                        <p class="text-sm text-secondary">Details of a scheduled or completed return pickup.</p>
-                        <div class="attributes mt-3 text-primary text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>pickup_id (PK)</li>
-                                <li>return_request_id (FK)</li>
-                                <li>delivery_agent_id (FK, nullable)</li>
-                                <li>pickup_date</li>
-                                <li>pickup_time_slot</li>
-                                <li>pickup_address_line1</li>
-                                <li>pickup_address_line2 (nullable)</li>
-                                <li>pickup_city</li>
-                                <li>pickup_state</li>
-                                <li>pickup_zip_code</li>
-                                <li>pickup_status (<span class="font-medium">Enum: Scheduled, Picked Up, Failed Pickup</span>)</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">InspectionResult</h4>
-                        <p class="text-sm text-secondary">Records the outcome of a returned item's inspection.</p>
-                        <div class="attributes mt-3 text-primary text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>inspection_id (PK)</li>
-                                <li>return_request_id (FK)</li>
-                                <li>inspector_name</li>
-                                <li>inspection_date</li>
-                                <li>result (<span class="font-medium">Enum: Resellable, Damaged, Defective, Missing Parts</span>)</li>
-                                <li>notes (nullable)</li>
+                                <li>pickup_date (nullable)</li>
+                                <li>pickup_time_slot (nullable)</li>
+                                <li>pickup_address_id (FK, nullable)</li>
+                                <li>pickup_agent_id (FK, nullable)</li>
+                                <li>inspection_result_enum (<span class="font-medium">Enum: Resellable, Damaged, Defective, Missing Parts, nullable</span>)</li>
+                                <li>inspection_notes (Text, nullable)</li>
+                                <li>inspector_name (nullable)</li>
                             </ul>
                         </div>
                     </div>
@@ -758,212 +568,63 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">Complaint</h4>
-                        <p class="text-sm text-secondary">Logs customer complaints or issues.</p>
-                        <div class="attributes mt-3 text-primary text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>complaint_id (PK)</li>
-                                <li>customer_id (FK)</li>
-                                <li>order_id (FK, nullable)</li>
-                                <li>complaint_date</li>
-                                <li>category (<span class="font-medium">Enum: Delivery Issue, Product Quality, Customer Service, Billing</span>)</li>
-                                <li>description</li>
-                                <li>status (<span class="font-medium">Enum: Open, In Progress, Resolved, Closed</span>)</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">Resolution</h4>
-                        <p class="text-sm text-secondary">Records how a complaint was resolved.</p>
-                        <div class="attributes mt-3 text-primary text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>resolution_id (PK)</li>
-                                <li>complaint_id (FK)</li>
-                                <li>resolved_by_agent_id (FK, nullable)</li>
-                                <li>resolution_date</li>
-                                <li>resolution_type (<span class="font-medium">Enum: Refund, Replacement, Credit, Explanation</span>)</li>
-                                <li>details</li>
-                            </ul>
-                        </div>
-                    </div>
                 </div>
 
                 <h3 class="text-primary text-2xl md:text-3xl font-bold mt-8 mb-4">Relationships in this Module</h3>
                 <div class="bg-secondary p-6 rounded-xl shadow-sm border border-color">
                     <ul class="list-disc pl-5 space-y-3 text-primary">
                         <li>
-                            <strong>Customer &harr; ReturnRequest (One-to-Many):</strong> A Customer can initiate multiple ReturnRequests, enabling tracking of customer return history.
+                            <strong>Customer &harr; ReturnRequest (One-to-Many):</strong> A Customer can initiate multiple ReturnRequests.
                         </li>
                         <li>
-                            <strong>OrderItem &harr; ReturnRequest (One-to-Many):</strong> A specific OrderItem (representing a particular product from an order) is linked to a ReturnRequest when it's being returned, providing clear traceability.
+                            <strong>OrderItem &harr; ReturnRequest (One-to-Many):</strong> A specific OrderItem is linked to a ReturnRequest.
                         </li>
                         <li>
-                            <strong>ReturnRequest &harr; ReturnPickup (One-to-Many):</strong> A ReturnRequest can have multiple ReturnPickup attempts or schedules (e.g., if the first pickup fails), allowing for management of return logistics.
+                            <strong>ReturnRequest &harr; Addresses (One-to-One/Many, optional):</strong> A ReturnRequest can have a pickup address.
                         </li>
                         <li>
-                            <strong>DeliveryAgent &harr; ReturnPickup (One-to-Many, optional):</strong> A DeliveryAgent can be assigned to multiple ReturnPickup tasks, enabling tracking of agent workload and performance for returns.
+                            <strong>ReturnRequest &harr; DeliveryAgent (One-to-Many, optional):</strong> A DeliveryAgent can be assigned to a ReturnRequest for pickup.
                         </li>
                         <li>
-                            <strong>ReturnRequest &harr; InspectionResult (One-to-One):</strong> Each ReturnRequest typically generates a single InspectionResult to assess the returned item's condition and determine eligibility for refund/restock.
+                            <strong>ReturnRequest &harr; Refund (One-to-One):</strong> An approved ReturnRequest leads to a single Refund.
                         </li>
                         <li>
-                            <strong>ReturnRequest &harr; Refund (One-to-One):</strong> An approved ReturnRequest leads to a single Refund transaction, ensuring financial closure for the return.
-                        </li>
-                        <li>
-                            <strong>Payment &harr; Refund (One-to-Many, optional):</strong> A Refund can optionally reference the original Payment transaction that it is reversing, facilitating reconciliation.
-                        </li>
-                        <li>
-                            <strong>Customer &harr; Complaint (One-to-Many):</strong> A Customer can submit multiple Complaints, providing a history of customer service interactions.
-                        </li>
-                        <li>
-                            <strong>Order &harr; Complaint (One-to-Many, optional):</strong> A Complaint can be optionally linked to a specific Order for contextual understanding of the issue.
-                        </li>
-                        <li>
-                            <strong>Complaint &harr; Resolution (One-to-One):</strong> Each Complaint receives a single Resolution record to document its outcome and the steps taken to address the issue.
-                        </li>
-                        <li>
-                            <strong>DeliveryAgent &harr; Resolution (One-to-Many, optional):</strong> While not explicitly a "support agent" table, DeliveryAgents might be involved in resolving delivery-related complaints, hence the optional link.
+                            <strong>Payment &harr; Refund (One-to-Many, optional):</strong> A Refund can optionally reference the original Payment transaction.
                         </li>
                     </ul>
-                </div>
-            </section>
-
-            <section id="analytics" class="content-section">
-                <h2 class="text-primary text-3xl md:text-4xl font-bold mb-4">📊 Analytics & Comms Module</h2>
-                <p class="text-secondary text-base mb-8">This module focuses on logging various operational statuses, tracking performance metrics, capturing customer feedback, and managing system notifications for communication.</p>
-
-                <h3 class="text-primary text-2xl md:text-3xl font-bold mb-4">Entities in this Module</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">DeliveryStatusLog</h4>
-                        <p class="text-sm text-secondary">Detailed historical log of package status changes.</p>
-                        <div class="attributes mt-3 text-primary text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>log_id (PK)</li>
-                                <li>package_id (FK)</li>
-                                <li>status_timestamp</li>
-                                <li>status_code (<span class="font-medium">e.g., Dispatched, In Transit, Delivered, Exception</span>)</li>
-                                <li>location_description (nullable)</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">PerformanceMetric</h4>
-                        <p class="text-sm text-secondary">Tracks various operational performance indicators.</p>
-                        <div class="attributes mt-3 text-primary text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>metric_id (PK)</li>
-                                <li>agent_id (FK, nullable)</li>
-                                <li>warehouse_id (FK, nullable)</li>
-                                <li>metric_date</li>
-                                <li>metric_type (<span class="font-medium">Enum: Delivery Success Rate, Picking Efficiency, Return Rate</span>)</li>
-                                <li>value</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">Feedback</h4>
-                        <p class="text-sm text-secondary">Captures customer satisfaction ratings and comments.</p>
-                        <div class="attributes mt-3 text-primary text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>feedback_id (PK)</li>
-                                <li>customer_id (FK)</li>
-                                <li>order_id (FK, nullable)</li>
-                                <li>rating (<span class="font-medium">1-5 Scale</span>)</li>
-                                <li>comment (nullable)</li>
-                                <li>feedback_date</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-bold text-lg accent-dark mb-2">Notification</h4>
-                        <p class="text-sm text-secondary">Stores system-generated messages for customers.</p>
-                        <div class="attributes mt-3 text-primary text-sm">
-                            <ul class="list-disc pl-5 space-y-1">
-                                <li>notification_id (PK)</li>
-                                <li>customer_id (FK)</li>
-                                <li>notification_type (<span class="font-medium">Enum: Order Shipped, Refund Issued, Delivery Update</span>)</li>
-                                <li>message</li>
-                                <li>timestamp</li>
-                                <li>is_read</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <h3 class="text-primary text-2xl md:text-3xl font-bold mt-8 mb-4">Relationships in this Module</h3>
-                <div class="bg-secondary p-6 rounded-xl shadow-sm border border-color">
-                    <ul class="list-disc pl-5 space-y-3 text-primary">
-                        <li>
-                            <strong>Package &harr; DeliveryStatusLog (One-to-Many):</strong> A Package generates multiple DeliveryStatusLog entries as its status changes throughout the delivery process, providing a detailed audit trail.
-                        </li>
-                        <li>
-                            <strong>DeliveryAgent &harr; PerformanceMetric (One-to-Many, optional):</strong> PerformanceMetrics can track the performance of individual DeliveryAgents (e.g., delivery success rate, average delivery time), aiding in agent management.
-                        </li>
-                        <li>
-                            <strong>Warehouse &harr; PerformanceMetric (One-to-Many, optional):</strong> PerformanceMetrics can also track the performance of Warehouse operations (e.g., picking efficiency, shipping accuracy), providing insights into warehouse effectiveness.
-                        </li>
-                        <li>
-                            <strong>Customer &harr; Feedback (One-to-Many):</strong> A Customer can provide multiple Feedback entries, allowing the business to gauge satisfaction over time and across different interactions.
-                        </li>
-                        <li>
-                            <strong>Order &harr; Feedback (One-to-Many, optional):</strong> Feedback can be optionally linked to a specific Order to provide context for the customer's comments or ratings.
-                        </li>
-                        <li>
-                            <strong>Customer &harr; Notification (One-to-Many):</strong> A Customer receives multiple Notifications from the system regarding their orders, returns, or other important updates, facilitating active communication.
-                        </li>
-                    </ul>
-                </div>
-
-                <h3 class="text-primary text-2xl md:text-3xl font-bold mt-12 mb-4">Example Analytics</h3>
-                <p class="text-secondary text-base mb-6">The tables in this module can power various dashboards and reports. Below are two examples of visualizations that could be built from this data to provide valuable business insights.</p>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="bg-secondary p-6 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-semibold mb-4 text-center text-primary">Agent Performance (Avg. Delivery Time)</h4>
-                        <div class="chart-container">
-                            <canvas id="agentPerformanceChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="bg-secondary p-6 rounded-xl shadow-sm border border-color">
-                        <h4 class="font-semibold mb-4 text-center text-primary">Top Return Reasons</h4>
-                        <div class="chart-container">
-                            <canvas id="returnReasonsChart"></canvas>
-                        </div>
-                    </div>
                 </div>
             </section>
 
             <section id="dbms_features" class="content-section">
                 <h2 class="text-primary text-3xl md:text-4xl font-bold mb-4">Business Logic & Advanced DBMS Features</h2>
-                <p class="text-secondary text-base mb-6">Beyond the schema, the system leverages advanced database features to ensure efficient operations and data integrity:</p>
+                <p class="text-secondary text-base mb-6">Even in a simplified schema, advanced database features can enforce integrity and automate processes:</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-secondary p-4 rounded-xl shadow-sm border border-color">
                         <h4 class="font-bold text-lg text-primary">✅ Stored Procedures:</h4>
                         <ul class="list-disc pl-5 text-primary space-y-1">
-                            <li>**Auto-assign nearest warehouse with stock to new order:** Optimizes fulfillment by selecting the best warehouse based on product availability and proximity to the customer.</li>
-                            <li>**Calculate delivery success rate per agent:** Automates performance metric generation for delivery personnel.</li>
-                            <li>**Determine most returned products (for QA insights):** Provides crucial data for quality assurance and product improvement.</li>
+                            <li>**ProcessNewOrder:** Handles the creation of a new order, its items, and initial payment.</li>
+                            <li>**UpdateInventory:** Manages stock levels (decrementing on sale, incrementing on return).</li>
                         </ul>
                     </div>
                     <div class="bg-secondary p-4 rounded-xl shadow-sm border border-color">
                         <h4 class="font-bold text-lg text-primary">🔔 Triggers:</h4>
                         <ul class="list-disc pl-5 text-primary space-y-1">
-                            <li>**On ReturnRequest insert &rarr; insert into InspectionResult with pending status:** Ensures every return request is automatically queued for inspection.</li>
-                            <li>**On Package delivery update &rarr; send notification to Customer:** Automates customer communication for delivery updates.</li>
+                            <li>**AfterOrderItemInsert:** Automatically reduces `Inventory.quantity_on_hand` for the respective product.</li>
+                            <li>**OnReturnRequestStatusChange:** Updates associated `Order.order_status` or triggers `Refund` creation based on return status.</li>
                         </ul>
                     </div>
                     <div class="bg-secondary p-4 rounded-xl shadow-sm border border-color">
                         <h4 class="font-bold text-lg text-primary">🔍 Views:</h4>
                         <ul class="list-disc pl-5 text-primary space-y-1">
-                            <li>**DailyOrderSummary, DelayedDeliveries, PendingRefunds:** Provide aggregated, simplified data sets for reporting and dashboards.</li>
-                            <li>**WarehouseStockSnapshot (for real-time inventory):** Offers an up-to-date, easy-to-query view of inventory levels without complex joins.</li>
+                            <li>**CurrentStockLevels:** Provides a simple view of products and their current quantities across warehouses.</li>
+                            <li>**ActiveShipments:** Shows all shipments currently in transit.</li>
                         </ul>
                     </div>
                      <div class="bg-secondary p-4 rounded-xl shadow-sm border border-color">
                         <h4 class="font-bold text-lg text-primary">⚡ Indexes:</h4>
                         <ul class="list-disc pl-5 text-primary space-y-1">
-                            <li>On `order_id`, `product_id`, `delivery_agent_id`, `warehouse_id` for faster joins and analytics, significantly improving query performance.</li>
+                            <li>On Foreign Key columns (e.g., `customer_id`, `product_id`, `order_id`) for faster join operations.</li>
+                            <li>On frequently queried columns (e.g., `email` in `Customer`, `tracking_number` in `Package`) for quick lookups.</li>
                         </ul>
                     </div>
                 </div>
@@ -993,11 +654,6 @@
                     localStorage.setItem('theme', 'light');
                     if (themeToggleDesktop) themeToggleDesktop.textContent = '☀️ Light Mode';
                     if (themeToggleMobile) themeToggleMobile.textContent = '☀️ Light Mode';
-                }
-                const analyticsSectionElement = document.getElementById('analytics');
-                if (analyticsSectionElement && analyticsSectionElement.classList.contains('active')) {
-                    createAgentPerformanceChart();
-                    createReturnReasonsChart();
                 }
             }
 
@@ -1089,153 +745,11 @@
             const initialTarget = window.location.hash.substring(1) || 'overview';
             showSection(initialTarget);
             
-            function createAgentPerformanceChart() {
-                const ctx = document.getElementById('agentPerformanceChart');
-                if (!ctx) return;
-                if (Chart.getChart(ctx)) {
-                    Chart.getChart(ctx).destroy();
-                }
-                const primaryTextColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text-primary').trim();
-                const accentMainColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent-main').trim();
-                const accentDarkColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent-dark').trim();
-                const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--color-border').trim();
-                const textSecondaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text-secondary').trim();
+            // Removed chart-related functions as the Analytics & Comms module is removed.
+            // createAgentPerformanceChart();
+            // createReturnReasonsChart();
 
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Agent A', 'Agent B', 'Agent C', 'Agent D', 'Agent E'],
-                        datasets: [{
-                            label: 'Avg. Delivery Time (minutes)',
-                            data: [35, 42, 28, 55, 39],
-                            backgroundColor: accentMainColor, 
-                            borderColor: accentDarkColor, 
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: borderColor 
-                                },
-                                ticks: {
-                                    color: textSecondaryColor 
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false
-                                },
-                                ticks: {
-                                    color: textSecondaryColor
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        }
-                    }
-                });
-            }
-
-            function createReturnReasonsChart() {
-                const ctx = document.getElementById('returnReasonsChart');
-                if (!ctx) return;
-                if (Chart.getChart(ctx)) {
-                    Chart.getChart(ctx).destroy();
-                }
-                const primaryTextColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text-primary').trim();
-                const accentMainColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent-main').trim();
-                const accentDarkColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent-dark').trim();
-                const textSecondaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text-secondary').trim();
-
-
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Wrong Size', 'Damaged Item', 'Not as Described', 'Changed Mind', 'Other'],
-                        datasets: [{
-                            label: 'Return Reasons',
-                            data: [300, 150, 120, 80, 50],
-                            backgroundColor: [
-                                accentMainColor, 
-                                '#0891b2',
-                                '#f59e0b',
-                                '#f43f5e',
-                                '#64748b'
-                            ],
-                            hoverOffset: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                         plugins: {
-                            legend: {
-                                position: 'top',
-                                labels: {
-                                    color: textSecondaryColor 
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-            
-            const analyticsSection = document.getElementById('analytics');
-            const observerConfig = { attributes: true, attributeFilter: ['class'] };
-
-            const analyticsObserver = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.attributeName === 'class' && mutation.target.classList.contains('active')) {
-                        createAgentPerformanceChart();
-                        createReturnReasonsChart();
-                    }
-                });
-            });
-
-            if (analyticsSection) {
-                 analyticsObserver.observe(analyticsSection, observerConfig);
-                 if (analyticsSection.classList.contains('active')) {
-                    createAgentPerformanceChart();
-                    createReturnReasonsChart();
-                 }
-            }
-
-            let resizeTimer;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(() => {
-                    if (analyticsSection && analyticsSection.classList.contains('active')) { 
-                        createAgentPerformanceChart();
-                        createReturnReasonsChart();
-                    }
-                }, 250);
-            });
-
-            new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.attributeName === 'class' && mutation.target.classList.contains('dark')) {
-                        const currentAnalyticsSection = document.getElementById('analytics'); 
-                        if (currentAnalyticsSection && currentAnalyticsSection.classList.contains('active')) {
-                            createAgentPerformanceChart();
-                            createReturnReasonsChart();
-                        }
-                    } else if (mutation.attributeName === 'class' && !mutation.target.classList.contains('dark')) {
-                         const currentAnalyticsSection = document.getElementById('analytics'); 
-                        if (currentAnalyticsSection && currentAnalyticsSection.classList.contains('active')) {
-                            createAgentPerformanceChart();
-                            createReturnReasonsChart();
-                        }
-                    }
-                });
-            }).observe(document.documentElement, observerConfig);
+            // Removed chart observation and resize logic.
         });
     </script>
 </body>
