@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBMS Project Website</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        html {
+             transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --color-bg-primary: #f8fafc;
+            --color-bg-secondary: #ffffff;
+            --color-text-primary: #1e293b;
+            --color-text-secondary: #475569;
+            --color-text-tertiary: #64748b;
+            --color-accent-main: #06b6d4;
+            --color-accent-dark: #0891b2;
+            --color-border: #e2e8f0;
+            --color-process-flow-bg: #f1f5f9;
+            --color-arrow: #94a3b8;
+            --color-list-marker: #06b6d4;
+        }
+
+        html.dark {
+            --color-bg-primary: #1a202c;
+            --color-bg-secondary: #2d3748;
+            --color-text-primary: #f1f5f9;
+            --color-text-secondary: #a0aec0;
+            --color-text-tertiary: #cbd5e0;
+            --color-accent-main: #22d3ee;
+            --color-accent-dark: #67e8f9;
+            --color-border: #4a5568;
+            --color-process-flow-bg: #4a5568;
+            --color-arrow: #a0aec0;
+            --color-list-marker: #22d3ee;
+        }
+
+        body {
+            background-color: var(--color-bg-primary);
+            color: var(--color-text-primary);
+        }
+        .text-primary { color: var(--color-text-primary); }
+        .text-secondary { color: var(--color-text-secondary); }
+        .text-tertiary { color: var(--color-text-tertiary); }
+        .accent-main { color: var(--color-accent-main); }
+        .accent-dark { color: var(--color-accent-dark); }
+        .bg-secondary { background-color: var(--color-bg-secondary); }
+        .border-color { border-color: var(--color-border); }
+        .bg-process-flow { background-color: var(--color-process-flow-bg); }
+        .text-arrow { color: var(--color-arrow); }
+        .sidebar-link.active {
+            background-color: var(--color-border);
+            color: var(--color-accent-dark);
+            font-weight: 600;
+        }
+        ul.list-disc li::marker {
+            color: var(--color-list-marker);
+        }
+
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        
+        .entity-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .entity-card .attributes {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+            padding-top: 0;
+        }
+        .entity-card.open .attributes {
+            max-height: 500px;
+            padding-top: 0.5rem;
+            transition: max-height 0.5s ease-in;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+            display: none;
+        }
+        .sidebar-nav {
+            position: fixed;
+            top: 0;
+            left: -256px;
+            width: 256px;
+            height: 100%;
+            background-color: var(--color-bg-secondary);
+            z-index: 50;
+            transition: left 0.3s ease-in-out;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+        }
+        .sidebar-nav.open {
+            left: 0;
+        }
+        @media (min-width: 768px) {
+            .sidebar-overlay {
+                display: none !important;
+            }
+            .sidebar-nav {
+                position: relative;
+                left: 0;
+                width: 256px;
+                box-shadow: none;
+                height: auto;
+                min-height: 100%;
+            }
+        }
+
+        .light-mode-er-diagram {
+            display: block;
+        }
+        .dark-mode-er-diagram {
+            display: none;
+        }
+        html.dark .light-mode-er-diagram {
+            display: none;
+        }
+        html.dark .dark-mode-er-diagram {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-primary text-primary min-h-screen flex flex-col">
+
+    <header class="md:hidden bg-secondary border-b border-color p-4 flex items-center justify-between z-30 relative">
+        <h1 class="text-xl font-bold accent-dark">DBMS Project</h1>
+        <div class="flex items-center space-x-4">
+            <button id="themeToggleMobile" class="text-secondary focus:outline-none">
+                ☀️ / 🌙
+            </button>
+            <button id="menuButton" class="text-secondary focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1">
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+        <aside id="sidebar" class="sidebar-nav md:static md:w-64 flex flex-col flex-shrink-0">
+            <div class="p-4 border-b border-color flex flex-col items-center">
+                <h1 class="text-xl font-bold accent-dark">DBMS Project</h1>
+                <p class="text-sm text-tertiary mb-2">E-Commerce Management System</p>
+                <button id="themeToggleDesktop" class="w-full flex items-center justify-center px-4 py-2 rounded-lg text-secondary bg-process-flow hover:bg-border transition-colors text-sm font-medium focus:outline-none">
+                    ☀️ Light Mode
+                </button>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="#overview" class="sidebar-link flex items-center px-4 py-2 rounded-lg hover:bg-process-flow transition-colors" data-target="overview">
+                    <span class="mr-3">🏠</span> Overview
+                </a>
+                <a href="#customer" class="sidebar-link flex items-center px-4 py-2 rounded-lg hover:bg-process-flow transition-colors" data-target="customer">
+                    <span class="mr-3">🛍️</span> Customer & Orders
+                </a>
+                <a href="#inventory" class="sidebar-link flex items-center px-4 py-2 rounded-lg hover:bg-process-flow transition-colors" data-target="inventory">
+                    <span class="mr-3">🏬</span> Warehouse & Inventory
+                </a>
+                <a href="#logistics" class="sidebar-link flex items-center px-4 py-2 rounded-lg hover:bg-process-flow transition-colors" data-target="logistics">
+                    <span class="mr-3">🚚</span> Logistics & Delivery
+                </a>
+                <a href="#returns" class="sidebar-link flex items-center px-4 py-2 rounded-lg hover:bg-process-flow transition-colors" data-target="returns">
+                    <span class="mr-3">🔁</span> Returns & Support
+                </a>
+                <a href="#analytics" class="sidebar-link flex items-center px-4 py-2 rounded-lg hover:bg-process-flow transition-colors" data-target="analytics">
+                    <span class="mr-3">📊</span> Analytics & Comms
+                </a>
+            </nav>
+            <div class="p-4 border-t border-color">
+                <p class="text-xs text-tertiary mt-4 text-center">&copy; 2025 Neel Mandal</p>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+            
+            <section id="overview" class="content-section">
+                <h2 class="text-primary text-3xl md:text-4xl font-bold mb-4">System Architecture Overview</h2>
+                <p class="text-secondary text-base mb-8">This application provides an interactive guide to the E-Commerce Fulfillment, Logistics, and Returns database schema. Use the sidebar to navigate through the core modules of the system. Each section explains the purpose of its tables and visualizes their relationships.</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-12">
+                    <div class="bg-secondary p-4 sm:p-6 rounded-xl shadow-sm text-center border border-color">
+                        <p class="text-3xl sm:text-4xl font-bold accent-main">29</p>
+                        <p class="text-tertiary font-medium text-sm sm:text-base">Total Tables</p>
+                    </div>
+                    <div class="bg-secondary p-4 sm:p-6 rounded-xl shadow-sm text-center border border-color">
+                        <p class="text-3xl sm:text-4xl font-bold accent-main">5</p>
+                        <p class="text-tertiary font-medium text-sm sm:text-base">Core Modules</p>
+                    </div>
+                    <div class="bg-secondary p-4 sm:p-6 rounded-xl shadow-sm text-center border border-color">
+                        <p class="text-3xl sm:text-4xl font-bold accent-main">35+</p>
+                        <p class="text-tertiary font-medium text-sm sm:text-base">Key Relationships</p>
+                    </div>
+                </div>
+
+                <h3 class="text-primary text-2xl md:text-3xl font-bold mb-4">Core Process Flow</h3>
+                <p class="text-secondary text-base mb-6">The diagram below illustrates how the major modules interact, from the initial customer order to final delivery and potential returns.</p>
+                <div class="bg-secondary p-4 sm:p-6 rounded-xl shadow-sm border border-color">
+                    <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4 text-center">
+                        <div class="p-3 sm:p-4 bg-process-flow rounded-lg w-full md:w-auto">
+                            <h4 class="font-bold text-sm sm:text-base text-primary">🛍️ Customer & Orders</h4>
+                            <p class="text-xs text-secondary">Customer places an order</p>
+                        </div>
+                        <div class="text-xl md:text-2xl text-arrow font-mono">&rarr;</div>
+                        <div class="p-3 sm:p-4 bg-process-flow rounded-lg w-full md:w-auto">
+                            <h4 class="font-bold text-sm sm:text-base text-primary">🏬 Warehouse & Inventory</h4>
+                            <p class="text-xs text-secondary">Stock is allocated and packed</p>
+                        </div>
+                        <div class="text-xl md:text-2xl text-arrow font-mono">&rarr;</div>
+                        <div class="p-3 sm:p-4 bg-process-flow rounded-lg w-full md:w-auto">
+                            <h4 class="font-bold text-sm sm:text-base text-primary">🚚 Logistics & Delivery</h4>
+                            <p class="text-xs text-secondary">Order is shipped and delivered</p>
+                        </div>
+                         <div class="text-xl md:text-2xl text-arrow font-mono">&rarr;</div>
+                        <div class="p-3 sm:p-4 bg-process-flow rounded-lg w-full md:w-auto">
+                            <h4 class="font-bold text-sm sm:text-base text-primary">🔁 Returns & Support</h4>
+                            <p class="text-xs text-secondary">Post-delivery actions handled</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-primary text-2xl md:text-3xl font-bold mt-12 mb-4">Detailed ER Diagrams</h3>
+                <p class="text-secondary text-base mb-6">For a comprehensive view of all table relationships across the entire system, refer to the full Entity-Relationship (ER) diagrams below. These images provide a detailed mapping of how all entities are interconnected. The diagrams will automatically switch to match your selected theme (light or dark mode).</p>
+                
+                <div class="flex flex-col items-center space-y-8 mb-8">
+                    <div class="bg-secondary p-4 rounded-xl shadow-sm w-full max-w-4xl border border-color light-mode-er-diagram">
+                        <img src="er1.png" ER Diagram 1 (Light Mode)" class="w-full h-auto object-contain rounded-lg shadow-md border border-color">
+                    </div>
+                    <div class="bg-secondary p-4 rounded-xl shadow-sm w-full max-w-4xl border border-color light-mode-er-diagram">
+                        <img src="er2.png" alt="ER Diagram 2 (Light Mode)" class="w-full h-auto object-contain rounded-lg shadow-md border border-color">
+                    </div>
+                    
+                    <div class="bg-secondary p-4 rounded-xl shadow-sm w-full max-w-4xl border border-color dark-mode-er-diagram">
+                        <img src="er1dark.png" alt="ER Diagram 1 (Dark Mode)" class="w-full h-auto object-contain rounded-lg shadow-md border border-color">
+                    </div>
+                    <div class="bg-secondary p-4 rounded-xl shadow-sm w-full max-w-4xl border border-color dark-mode-er-diagram">
+                        <img src="er2dark.png" alt="ER Diagram 2 (Dark Mode)" class="w-full h-auto object-contain rounded-lg shadow-md border border-color">
+                    </div>
+                </div>
+                <p class="text-tertiary text-center text-xs mb-8">ER Diagrams generated by <a href="https://sqlflow.gudusoft.com/#/" target="_blank" class="accent-main hover:underline">sqlflow.gudusoft.com</a></p>
+            </section>
+
+            <section id="customer" class="content-section">
+                <h2 class="text-primary text-3xl md:text-4xl font-bold mb-4">🛍️ Customer & Orders Module</h2>
+                <p class="text-secondary text-base mb-8">This module manages all customer accounts, orders placed, products in the catalog, and associated payment transactions. It forms the core of the e-commerce front end.</p>
+
+                <h3 class="text-primary text-2xl md:text-3xl font-bold mb-4">Entities in this Module</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">Customer</h4>
+                        <p class="text-sm text-secondary">Stores customer personal and contact information.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>customer_id (PK)</li>
+                                <li>first_name</li>
+                                <li>last_name</li>
+                                <li>email (Unique)</li>
+                                <li>phone_number</li>
+                                <li>address_line1</li>
+                                <li>address_line2 (nullable)</li>
+                                <li>city</li>
+                                <li>state</li>
+                                <li>zip_code</li>
+                                <li>country</li>
+                                <li>created_at</li>
+                                <li>updated_at</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">Order</h4>
+                        <p class="text-sm text-secondary">Records details of each customer order.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>order_id (PK)</li>
+                                <li>customer_id (FK)</li>
+                                <li>order_status (<span class="font-medium">Enum: Pending, Processing, Shipped, Delivered, Cancelled</span>)</li>
+                                <li>order_datetime</li>
+                                <li>total_amount</li>
+                                <li>shipping_address_line1</li>
+                                <li>shipping_address_line2 (nullable)</li>
+                                <li>shipping_city</li>
+                                <li>shipping_state</li>
+                                <li>shipping_zip_code</li>
+                                <li>shipping_country</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">Product</h4>
+                        <p class="text-sm text-secondary">Defines the characteristics of each sellable item.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>product_id (PK)</li>
+                                <li>sku (Unique)</li>
+                                <li>name</li>
+                                <li>category</li>
+                                <li>weight_kg</li>
+                                <li>dimensions_cm (<span class="font-medium">e.g., "10x15x5"</span>)</li>
+                                <li>description (nullable)</li>
+                                <li>created_at</li>
+                                <li>updated_at</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">OrderItem</h4>
+                        <p class="text-sm text-secondary">Represents individual items within an order.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>order_item_id (PK)</li>
+                                <li>order_id (FK)</li>
+                                <li>product_id (FK)</li>
+                                <li>quantity</li>
+                                <li>unit_price</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">Payment</h4>
+                        <p class="text-sm text-secondary">Logs payment transactions for orders.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>payment_id (PK)</li>
+                                <li>order_id (FK)</li>
+                                <li>payment_mode (<span class="font-medium">Enum: Credit Card, UPI, COD, Net Banking</span>)</li>
+                                <li>transaction_id (Unique)</li>
+                                <li>payment_status (<span class="font-medium">Enum: Completed, Failed, Refunded, Pending</span>)</li>
+                                <li>payment_amount</li>
+                                <li>payment_datetime</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-primary text-2xl md:text-3xl font-bold mt-8 mb-4">Relationships in this Module</h3>
+                <div class="bg-secondary p-6 rounded-xl shadow-sm border border-color">
+                    <ul class="list-disc pl-5 space-y-3 text-primary">
+                        <li>
+                            <strong>Customer &harr; Order (One-to-Many):</strong> A Customer can place multiple Orders. This relationship (Customer.customer_id &rarr; Order.customer_id) is crucial for tracking customer purchase history and attributing orders to specific users.
+                        </li>
+                        <li>
+                            <strong>Order &harr; OrderItem (One-to-Many):</strong> An Order can contain multiple OrderItems, each representing a distinct product and quantity. This relationship (Order.order_id &rarr; OrderItem.order_id) allows for a detailed breakdown of an order's contents.
+                        </li>
+                        <li>
+                            <strong>Product &harr; OrderItem (One-to-Many):</strong> A Product can appear in many OrderItems across different orders. This link (Product.product_id &rarr; OrderItem.product_id) enables tracking which products are sold in which orders.
+                        </li>
+                        <li>
+                            <strong>Order &harr; Payment (One-to-Many):</strong> An Order can have multiple Payment records (e.g., failed attempts, refunds linked to original payment). This relationship (Order.order_id &rarr; Payment.order_id) ensures comprehensive payment tracking for financial reconciliation.
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="inventory" class="content-section">
+                <h2 class="text-primary text-3xl md:text-4xl font-bold mb-4">🏬 Warehouse & Inventory Module</h2>
+                <p class="text-secondary text-base mb-8">This module handles the physical storage locations, stock levels of products, and the procurement process for replenishing inventory.</p>
+
+                <h3 class="text-primary text-2xl md:text-3xl font-bold mb-4">Entities in this Module</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">Warehouse</h4>
+                        <p class="text-sm text-secondary">Details of each physical warehouse location.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>warehouse_id (PK)</li>
+                                <li>name</li>
+                                <li>location_address</li>
+                                <li>city</li>
+                                <li>state</li>
+                                <li>zip_code</li>
+                                <li>country</li>
+                                <li>capacity_sqft</li>
+                                <li>contact_phone</li>
+                                <li>contact_email</li>
+                                <li>created_at</li>
+                                <li>updated_at</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">WarehouseZone</h4>
+                        <p class="text-sm text-secondary">Defines specific zones within a warehouse.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>zone_id (PK)</li>
+                                <li>warehouse_id (FK)</li>
+                                <li>zone_name</li>
+                                <li>zone_type (<span class="font-medium">Enum: Aisle, Cold Storage, Bulk, Picking</span>)</li>
+                                <li>capacity_limit (nullable)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">Inventory</h4>
+                        <p class="text-sm text-secondary">Tracks real-time stock levels of products at each warehouse.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>inventory_id (PK)</li>
+                                <li>warehouse_id (FK)</li>
+                                <li>product_id (FK)</li>
+                                <li>quantity_on_hand</li>
+                                <li>min_stock_level</li>
+                                <li>max_stock_level</li>
+                                <li>last_updated</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">Supplier</h4>
+                        <p class="text-sm text-secondary">Information about product suppliers.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>supplier_id (PK)</li>
+                                <li>name</li>
+                                <li>contact_person</li>
+                                <li>contact_email</li>
+                                <li>contact_phone</li>
+                                <li>address</li>
+                                <li>created_at</li>
+                                <li>updated_at</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">ProcurementOrder</h4>
+                        <p class="text-sm text-secondary">Tracks orders placed with suppliers to replenish stock.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>procurement_order_id (PK)</li>
+                                <li>supplier_id (FK)</li>
+                                <li>warehouse_id (FK)</li>
+                                <li>order_date</li>
+                                <li>expected_delivery_date</li>
+                                <li>actual_delivery_date (nullable)</li>
+                                <li>status (<span class="font-medium">Enum: Pending, Ordered, Received, Cancelled</span>)</li>
+                                <li>total_cost</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">ProcurementOrderItem</h4>
+                        <p class="text-sm text-secondary">Individual items within a procurement order.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>procurement_order_item_id (PK)</li>
+                                <li>procurement_order_id (FK)</li>
+                                <li>product_id (FK)</li>
+                                <li>quantity</li>
+                                <li>unit_price</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">StockTransfer</h4>
+                        <p class="text-sm text-secondary">Records movement of stock between warehouses.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>transfer_id (PK)</li>
+                                <li>from_warehouse_id (FK)</li>
+                                <li>to_warehouse_id (FK)</li>
+                                <li>product_id (FK)</li>
+                                <li>quantity</li>
+                                <li>transfer_datetime</li>
+                                <li>status (<span class="font-medium">Enum: In Transit, Completed, Cancelled</span>)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-primary text-2xl md:text-3xl font-bold mt-8 mb-4">Relationships in this Module</h3>
+                <div class="bg-secondary p-6 rounded-xl shadow-sm border border-color">
+                    <ul class="list-disc pl-5 space-y-3 text-primary">
+                        <li>
+                            <strong>Warehouse &harr; WarehouseZone (One-to-Many):</strong> A Warehouse can have multiple defined WarehouseZones, enabling granular organization of storage space within each facility.
+                        </li>
+                        <li>
+                            <strong>Warehouse &harr; Inventory (One-to-Many):</strong> A Warehouse holds Inventory for many different Products. This relationship, often using a composite key of warehouse_id and product_id, ensures unique stock tracking per product per warehouse.
+                        </li>
+                        <li>
+                            <strong>Product &harr; Inventory (One-to-Many):</strong> A Product's Inventory levels are tracked across various Warehouse locations. This allows for distributed inventory management.
+                        </li>
+                        <li>
+                            <strong>Supplier &harr; ProcurementOrder (One-to-Many):</strong> A Supplier can receive multiple ProcurementOrders from the company, enabling tracking of all inbound stock orders from various vendors.
+                        </li>
+                        <li>
+                            <strong>Warehouse &harr; ProcurementOrder (One-to-Many):</strong> Each ProcurementOrder is directed to a specific Warehouse to replenish its stock, linking procurement activities directly to inventory destinations.
+                        </li>
+                        <li>
+                            <strong>ProcurementOrder &harr; ProcurementOrderItem (One-to-Many):</strong> A ProcurementOrder comprises several ProcurementOrderItems, detailing the specific products and quantities ordered from the supplier.
+                        </li>
+                        <li>
+                            <strong>Product &harr; ProcurementOrderItem (One-to-Many):</strong> A Product can be part of many ProcurementOrderItems across different procurement orders, allowing for tracking product demand from suppliers.
+                        </li>
+                        <li>
+                            <strong>Warehouse &harr; StockTransfer (One-to-Many on both 'from' and 'to'):</strong> The StockTransfer table records movement of products *from* one Warehouse and *to* another, which is vital for managing inter-warehouse logistics and inventory balancing.
+                        </li>
+                        <li>
+                            <strong>Product &harr; StockTransfer (One-to-Many):</strong> A Product can be the item being moved in many StockTransfer operations, providing traceability of product movements between warehouses.
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="logistics" class="content-section">
+                <h2 class="text-primary text-3xl md:text-4xl font-bold mb-4">🚚 Logistics & Delivery Module</h2>
+                <p class="text-secondary text-base mb-8">This module orchestrates the delivery process, from assigning agents and vehicles to managing routes, shipments, and individual packages.</p>
+
+                <h3 class="text-primary text-2xl md:text-3xl font-bold mb-4">Entities in this Module</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">DeliveryAgent</h4>
+                        <p class="text-sm text-secondary">Details of delivery personnel.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>agent_id (PK)</li>
+                                <li>first_name</li>
+                                <li>last_name</li>
+                                <li>contact_phone (Unique)</li>
+                                <li>email (Unique)</li>
+                                <li>hire_date</li>
+                                <li>agent_status (<span class="font-medium">Enum: Active, On Leave, Inactive</span>)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">Vehicle</h4>
+                        <p class="text-sm text-secondary">Information about delivery vehicles.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>vehicle_id (PK)</li>
+                                <li>agent_id (FK, nullable)</li>
+                                <li>license_plate (Unique)</li>
+                                <li>type (<span class="font-medium">Enum: Bike, Van, Truck</span>)</li>
+                                <li>capacity_kg</li>
+                                <li>status (<span class="font-medium">Enum: Available, In Use, Maintenance</span>)</li>
+                                <li>last_service_date</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">Route</h4>
+                        <p class="text-sm text-secondary">Defines planned delivery routes.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>route_id (PK)</li>
+                                <li>delivery_date</li>
+                                <li>start_location</li>
+                                <li>end_location</li>
+                                <li>area_code</li>
+                                <li>route_status (<span class="font-medium">Enum: Planned, In Progress, Completed, Cancelled</span>)</li>
+                                <li>created_at</li>
+                                <li>updated_at</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">RouteStop</h4>
+                        <p class="text-sm text-secondary">Individual stops on a delivery route.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>stop_id (PK)</li>
+                                <li>route_id (FK)</li>
+                                <li>stop_sequence</li>
+                                <li>location_address</li>
+                                <li>city</li>
+                                <li>state</li>
+                                <li>zip_code</li>
+                                <li>estimated_arrival_time</li>
+                                <li>actual_arrival_time (nullable)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">Shipment</h4>
+                        <p class="text-sm text-secondary">Represents a single delivery trip carrying one or more packages.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>shipment_id (PK)</li>
+                                <li>route_id (FK, nullable)</li>
+                                <li>delivery_agent_id (FK)</li>
+                                <li>warehouse_id (FK)</li>
+                                <li>vehicle_id (FK, nullable)</li>
+                                <li>shipment_datetime</li>
+                                <li>delivery_status (<span class="font-medium">Enum: Out for Delivery, Delivered, Attempted, Failed, Returned</span>)</li>
+                                <li>estimated_delivery_datetime</li>
+                                <li>actual_delivery_datetime (nullable)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">Package</h4>
+                        <p class="text-sm text-secondary">Individual physical packages, linked to order items.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>package_id (PK)</li>
+                                <li>order_item_id (FK)</li>
+                                <li>shipment_id (FK, nullable)</li>
+                                <li>tracking_number (Unique)</li>
+                                <li>package_status (<span class="font-medium">Enum: Packed, In Transit, Delivered, Damaged, Lost</span>)</li>
+                                <li>weight_kg</li>
+                                <li>dimensions_cm</li>
+                                <li>packed_date</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">TripLog</h4>
+                        <p class="text-sm text-secondary">Detailed logs of delivery agent trips.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>trip_log_id (PK)</li>
+                                <li>shipment_id (FK)</li>
+                                <li>start_time</li>
+                                <li>end_time</li>
+                                <li>start_location</li>
+                                <li>end_location</li>
+                                <li>distance_km</li>
+                                <li>notes (nullable)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-primary text-2xl md:text-3xl font-bold mt-8 mb-4">Relationships in this Module</h3>
+                <div class="bg-secondary p-6 rounded-xl shadow-sm border border-color">
+                    <ul class="list-disc pl-5 space-y-3 text-primary">
+                        <li>
+                            <strong>DeliveryAgent &harr; Vehicle (One-to-Many, optional):</strong> A DeliveryAgent can be assigned to a Vehicle. This relationship is nullable to allow for scenarios where vehicles are shared or agents use personal transport not tracked in this table.
+                        </li>
+                        <li>
+                            <strong>Route &harr; RouteStop (One-to-Many):</strong> A Route is composed of multiple ordered RouteStops, defining the precise sequence of locations a delivery agent must visit.
+                        </li>
+                        <li>
+                            <strong>DeliveryAgent &harr; Shipment (One-to-Many):</strong> A DeliveryAgent can handle multiple Shipments, centralizing agent performance tracking and workload management.
+                        </li>
+                        <li>
+                            <strong>Warehouse &harr; Shipment (One-to-Many):</strong> Each Shipment originates from a specific Warehouse, linking the physical inventory pickup to the delivery process.
+                        </li>
+                        <li>
+                            <strong>Vehicle &harr; Shipment (One-to-Many, optional):</strong> A Vehicle can be used for many Shipments. This is nullable if vehicle assignment isn't always tracked at the shipment level, or if agents use personal vehicles.
+                        </li>
+                        <li>
+                            <strong>Route &harr; Shipment (One-to-Many, optional):</strong> A Shipment can be part of a larger planned Route, or it might be a direct shipment not tied to a complex route.
+                        </li>
+                        <li>
+                            <strong>OrderItem &harr; Package (One-to-Many):</strong> Each OrderItem from a customer's order is prepared as a unique Package for physical handling and delivery. This is a critical link for tracing individual items.
+                        </li>
+                        <li>
+                            <strong>Shipment &harr; Package (One-to-Many, optional):</strong> A Shipment typically bundles multiple Packages together for a single delivery run. This relationship is nullable if a package is packed but not yet assigned to a shipment.
+                        </li>
+                        <li>
+                            <strong>Shipment &harr; TripLog (One-to-Many):</strong> A Shipment generates TripLog entries, recording detailed journey information such as start/end times and locations for route analysis and optimization.
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="returns" class="content-section">
+                <h2 class="text-primary text-3xl md:text-4xl font-bold mb-4">🔁 Returns & Support Module</h2>
+                <p class="text-secondary text-base mb-8">This module manages the entire lifecycle of product returns, including requests, pickups, inspections, refunds, and customer complaints and their resolutions.</p>
+
+                <h3 class="text-primary text-2xl md:text-3xl font-bold mb-4">Entities in this Module</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">ReturnRequest</h4>
+                        <p class="text-sm text-secondary">Initial request from a customer to return an item.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>return_request_id (PK)</li>
+                                <li>customer_id (FK)</li>
+                                <li>order_item_id (FK)</li>
+                                <li>request_date</li>
+                                <li>reason (<span class="font-medium">Enum: Damaged, Wrong Size, Not as Described, Changed Mind</span>)</li>
+                                <li>return_status (<span class="font-medium">Enum: Pending, Scheduled Pickup, Received, Inspected, Refunded, Rejected</span>)</li>
+                                <li>pickup_scheduled_date (nullable)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">ReturnPickup</h4>
+                        <p class="text-sm text-secondary">Details of a scheduled or completed return pickup.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>pickup_id (PK)</li>
+                                <li>return_request_id (FK)</li>
+                                <li>delivery_agent_id (FK, nullable)</li>
+                                <li>pickup_date</li>
+                                <li>pickup_time_slot</li>
+                                <li>pickup_address_line1</li>
+                                <li>pickup_address_line2 (nullable)</li>
+                                <li>pickup_city</li>
+                                <li>pickup_state</li>
+                                <li>pickup_zip_code</li>
+                                <li>pickup_status (<span class="font-medium">Enum: Scheduled, Picked Up, Failed Pickup</span>)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">InspectionResult</h4>
+                        <p class="text-sm text-secondary">Records the outcome of a returned item's inspection.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>inspection_id (PK)</li>
+                                <li>return_request_id (FK)</li>
+                                <li>inspector_name</li>
+                                <li>inspection_date</li>
+                                <li>result (<span class="font-medium">Enum: Resellable, Damaged, Defective, Missing Parts</span>)</li>
+                                <li>notes (nullable)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">Refund</h4>
+                        <p class="text-sm text-secondary">Records processed refunds to customers.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>refund_id (PK)</li>
+                                <li>return_request_id (FK)</li>
+                                <li>payment_id (FK, nullable)</li>
+                                <li>refund_amount</li>
+                                <li>refund_status (<span class="font-medium">Enum: Pending, Processed, Failed</span>)</li>
+                                <li>refund_reason (nullable)</li>
+                                <li>refund_datetime</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">Complaint</h4>
+                        <p class="text-sm text-secondary">Logs customer complaints or issues.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>complaint_id (PK)</li>
+                                <li>customer_id (FK)</li>
+                                <li>order_id (FK, nullable)</li>
+                                <li>complaint_date</li>
+                                <li>category (<span class="font-medium">Enum: Delivery Issue, Product Quality, Customer Service, Billing</span>)</li>
+                                <li>description</li>
+                                <li>status (<span class="font-medium">Enum: Open, In Progress, Resolved, Closed</span>)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">Resolution</h4>
+                        <p class="text-sm text-secondary">Records how a complaint was resolved.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>resolution_id (PK)</li>
+                                <li>complaint_id (FK)</li>
+                                <li>resolved_by_agent_id (FK, nullable)</li>
+                                <li>resolution_date</li>
+                                <li>resolution_type (<span class="font-medium">Enum: Refund, Replacement, Credit, Explanation</span>)</li>
+                                <li>details</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-primary text-2xl md:text-3xl font-bold mt-8 mb-4">Relationships in this Module</h3>
+                <div class="bg-secondary p-6 rounded-xl shadow-sm border border-color">
+                    <ul class="list-disc pl-5 space-y-3 text-primary">
+                        <li>
+                            <strong>Customer &harr; ReturnRequest (One-to-Many):</strong> A Customer can initiate multiple ReturnRequests, enabling tracking of customer return history.
+                        </li>
+                        <li>
+                            <strong>OrderItem &harr; ReturnRequest (One-to-Many):</strong> A specific OrderItem (representing a particular product from an order) is linked to a ReturnRequest when it's being returned, providing clear traceability.
+                        </li>
+                        <li>
+                            <strong>ReturnRequest &harr; ReturnPickup (One-to-Many):</strong> A ReturnRequest can have multiple ReturnPickup attempts or schedules (e.g., if the first pickup fails), allowing for management of return logistics.
+                        </li>
+                        <li>
+                            <strong>DeliveryAgent &harr; ReturnPickup (One-to-Many, optional):</strong> A DeliveryAgent can be assigned to multiple ReturnPickup tasks, enabling tracking of agent workload and performance for returns.
+                        </li>
+                        <li>
+                            <strong>ReturnRequest &harr; InspectionResult (One-to-One):</strong> Each ReturnRequest typically generates a single InspectionResult to assess the returned item's condition and determine eligibility for refund/restock.
+                        </li>
+                        <li>
+                            <strong>ReturnRequest &harr; Refund (One-to-One):</strong> An approved ReturnRequest leads to a single Refund transaction, ensuring financial closure for the return.
+                        </li>
+                        <li>
+                            <strong>Payment &harr; Refund (One-to-Many, optional):</strong> A Refund can optionally reference the original Payment transaction that it is reversing, facilitating reconciliation.
+                        </li>
+                        <li>
+                            <strong>Customer &harr; Complaint (One-to-Many):</strong> A Customer can submit multiple Complaints, providing a history of customer service interactions.
+                        </li>
+                        <li>
+                            <strong>Order &harr; Complaint (One-to-Many, optional):</strong> A Complaint can be optionally linked to a specific Order for contextual understanding of the issue.
+                        </li>
+                        <li>
+                            <strong>Complaint &harr; Resolution (One-to-One):</strong> Each Complaint receives a single Resolution record to document its outcome and the steps taken to address the issue.
+                        </li>
+                        <li>
+                            <strong>DeliveryAgent &harr; Resolution (One-to-Many, optional):</strong> While not explicitly a "support agent" table, DeliveryAgents might be involved in resolving delivery-related complaints, hence the optional link.
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="analytics" class="content-section">
+                <h2 class="text-primary text-3xl md:text-4xl font-bold mb-4">📊 Analytics & Comms Module</h2>
+                <p class="text-secondary text-base mb-8">This module focuses on logging various operational statuses, tracking performance metrics, capturing customer feedback, and managing system notifications for communication.</p>
+
+                <h3 class="text-primary text-2xl md:text-3xl font-bold mb-4">Entities in this Module</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">DeliveryStatusLog</h4>
+                        <p class="text-sm text-secondary">Detailed historical log of package status changes.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>log_id (PK)</li>
+                                <li>package_id (FK)</li>
+                                <li>status_timestamp</li>
+                                <li>status_code (<span class="font-medium">e.g., Dispatched, In Transit, Delivered, Exception</span>)</li>
+                                <li>location_description (nullable)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">PerformanceMetric</h4>
+                        <p class="text-sm text-secondary">Tracks various operational performance indicators.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>metric_id (PK)</li>
+                                <li>agent_id (FK, nullable)</li>
+                                <li>warehouse_id (FK, nullable)</li>
+                                <li>metric_date</li>
+                                <li>metric_type (<span class="font-medium">Enum: Delivery Success Rate, Picking Efficiency, Return Rate</span>)</li>
+                                <li>value</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">Feedback</h4>
+                        <p class="text-sm text-secondary">Captures customer satisfaction ratings and comments.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>feedback_id (PK)</li>
+                                <li>customer_id (FK)</li>
+                                <li>order_id (FK, nullable)</li>
+                                <li>rating (<span class="font-medium">1-5 Scale</span>)</li>
+                                <li>comment (nullable)</li>
+                                <li>feedback_date</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="entity-card bg-secondary p-5 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg accent-dark mb-2">Notification</h4>
+                        <p class="text-sm text-secondary">Stores system-generated messages for customers.</p>
+                        <div class="attributes mt-3 text-primary text-sm">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>notification_id (PK)</li>
+                                <li>customer_id (FK)</li>
+                                <li>notification_type (<span class="font-medium">Enum: Order Shipped, Refund Issued, Delivery Update</span>)</li>
+                                <li>message</li>
+                                <li>timestamp</li>
+                                <li>is_read</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-primary text-2xl md:text-3xl font-bold mt-8 mb-4">Relationships in this Module</h3>
+                <div class="bg-secondary p-6 rounded-xl shadow-sm border border-color">
+                    <ul class="list-disc pl-5 space-y-3 text-primary">
+                        <li>
+                            <strong>Package &harr; DeliveryStatusLog (One-to-Many):</strong> A Package generates multiple DeliveryStatusLog entries as its status changes throughout the delivery process, providing a detailed audit trail.
+                        </li>
+                        <li>
+                            <strong>DeliveryAgent &harr; PerformanceMetric (One-to-Many, optional):</strong> PerformanceMetrics can track the performance of individual DeliveryAgents (e.g., delivery success rate, average delivery time), aiding in agent management.
+                        </li>
+                        <li>
+                            <strong>Warehouse &harr; PerformanceMetric (One-to-Many, optional):</strong> PerformanceMetrics can also track the performance of Warehouse operations (e.g., picking efficiency, shipping accuracy), providing insights into warehouse effectiveness.
+                        </li>
+                        <li>
+                            <strong>Customer &harr; Feedback (One-to-Many):</strong> A Customer can provide multiple Feedback entries, allowing the business to gauge satisfaction over time and across different interactions.
+                        </li>
+                        <li>
+                            <strong>Order &harr; Feedback (One-to-Many, optional):</strong> Feedback can be optionally linked to a specific Order to provide context for the customer's comments or ratings.
+                        </li>
+                        <li>
+                            <strong>Customer &harr; Notification (One-to-Many):</strong> A Customer receives multiple Notifications from the system regarding their orders, returns, or other important updates, facilitating active communication.
+                        </li>
+                    </ul>
+                </div>
+
+                <h3 class="text-primary text-2xl md:text-3xl font-bold mt-12 mb-4">Example Analytics</h3>
+                <p class="text-secondary text-base mb-6">The tables in this module can power various dashboards and reports. Below are two examples of visualizations that could be built from this data to provide valuable business insights.</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-secondary p-6 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-semibold mb-4 text-center text-primary">Agent Performance (Avg. Delivery Time)</h4>
+                        <div class="chart-container">
+                            <canvas id="agentPerformanceChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-secondary p-6 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-semibold mb-4 text-center text-primary">Top Return Reasons</h4>
+                        <div class="chart-container">
+                            <canvas id="returnReasonsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="dbms_features" class="content-section">
+                <h2 class="text-primary text-3xl md:text-4xl font-bold mb-4">Business Logic & Advanced DBMS Features</h2>
+                <p class="text-secondary text-base mb-6">Beyond the schema, the system leverages advanced database features to ensure efficient operations and data integrity:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-secondary p-4 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg text-primary">✅ Stored Procedures:</h4>
+                        <ul class="list-disc pl-5 text-primary space-y-1">
+                            <li>**Auto-assign nearest warehouse with stock to new order:** Optimizes fulfillment by selecting the best warehouse based on product availability and proximity to the customer.</li>
+                            <li>**Calculate delivery success rate per agent:** Automates performance metric generation for delivery personnel.</li>
+                            <li>**Determine most returned products (for QA insights):** Provides crucial data for quality assurance and product improvement.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-secondary p-4 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg text-primary">🔔 Triggers:</h4>
+                        <ul class="list-disc pl-5 text-primary space-y-1">
+                            <li>**On ReturnRequest insert &rarr; insert into InspectionResult with pending status:** Ensures every return request is automatically queued for inspection.</li>
+                            <li>**On Package delivery update &rarr; send notification to Customer:** Automates customer communication for delivery updates.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-secondary p-4 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg text-primary">🔍 Views:</h4>
+                        <ul class="list-disc pl-5 text-primary space-y-1">
+                            <li>**DailyOrderSummary, DelayedDeliveries, PendingRefunds:** Provide aggregated, simplified data sets for reporting and dashboards.</li>
+                            <li>**WarehouseStockSnapshot (for real-time inventory):** Offers an up-to-date, easy-to-query view of inventory levels without complex joins.</li>
+                        </ul>
+                    </div>
+                     <div class="bg-secondary p-4 rounded-xl shadow-sm border border-color">
+                        <h4 class="font-bold text-lg text-primary">⚡ Indexes:</h4>
+                        <ul class="list-disc pl-5 text-primary space-y-1">
+                            <li>On `order_id`, `product_id`, `delivery_agent_id`, `warehouse_id` for faster joins and analytics, significantly improving query performance.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const entityCards = document.querySelectorAll('.entity-card');
+            const menuButton = document.getElementById('menuButton');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const themeToggleDesktop = document.getElementById('themeToggleDesktop');
+            const themeToggleMobile = document.getElementById('themeToggleMobile');
+
+            function setTheme(isDark) {
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                    if (themeToggleDesktop) themeToggleDesktop.textContent = '🌙 Dark Mode';
+                    if (themeToggleMobile) themeToggleMobile.textContent = '🌙 Dark Mode';
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                    if (themeToggleDesktop) themeToggleDesktop.textContent = '☀️ Light Mode';
+                    if (themeToggleMobile) themeToggleMobile.textContent = '☀️ Light Mode';
+                }
+                const analyticsSectionElement = document.getElementById('analytics');
+                if (analyticsSectionElement && analyticsSectionElement.classList.contains('active')) {
+                    createAgentPerformanceChart();
+                    createReturnReasonsChart();
+                }
+            }
+
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                setTheme(true);
+            } else {
+                setTheme(false);
+            }
+
+            if (themeToggleDesktop) {
+                themeToggleDesktop.addEventListener('click', () => {
+                    setTheme(!document.documentElement.classList.contains('dark'));
+                });
+            }
+            if (themeToggleMobile) {
+                themeToggleMobile.addEventListener('click', () => {
+                    setTheme(!document.documentElement.classList.contains('dark'));
+                });
+            }
+
+
+            function showSection(targetId) {
+                contentSections.forEach(section => {
+                    if (section) { 
+                        section.classList.toggle('active', section.id === targetId);
+                    }
+                });
+                if (sidebarLinks) { 
+                    sidebarLinks.forEach(link => {
+                        if (link) { 
+                            link.classList.toggle('active', link.dataset.target === targetId);
+                        }
+                    });
+                }
+                if (window.innerWidth < 768) {
+                    if (sidebar) { 
+                        sidebar.classList.remove('open');
+                    }
+                    if (sidebarOverlay) { 
+                        sidebarOverlay.style.display = 'none';
+                    }
+                }
+            }
+
+            if (menuButton) {
+                menuButton.addEventListener('click', function() {
+                    if (sidebar) { 
+                        sidebar.classList.toggle('open');
+                    }
+                    if (sidebarOverlay) { 
+                        sidebarOverlay.style.display = sidebar && sidebar.classList.contains('open') ? 'block' : 'none';
+                    }
+                });
+            }
+
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', function() {
+                    if (sidebar) { 
+                        sidebar.classList.remove('open');
+                    }
+                    sidebarOverlay.style.display = 'none';
+                });
+            }
+
+            if (sidebarLinks) { 
+                sidebarLinks.forEach(link => {
+                    if (link) { 
+                        link.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            const targetId = this.dataset.target;
+                            window.location.hash = targetId;
+                            showSection(targetId);
+                        });
+                    }
+                });
+            }
+
+            if (entityCards) { 
+                entityCards.forEach(card => {
+                    if (card) { 
+                        card.addEventListener('click', function() {
+                            this.classList.toggle('open');
+                        });
+                    }
+                });
+            }
+
+            const initialTarget = window.location.hash.substring(1) || 'overview';
+            showSection(initialTarget);
+            
+            function createAgentPerformanceChart() {
+                const ctx = document.getElementById('agentPerformanceChart');
+                if (!ctx) return;
+                if (Chart.getChart(ctx)) {
+                    Chart.getChart(ctx).destroy();
+                }
+                const primaryTextColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text-primary').trim();
+                const accentMainColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent-main').trim();
+                const accentDarkColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent-dark').trim();
+                const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--color-border').trim();
+                const textSecondaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text-secondary').trim();
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Agent A', 'Agent B', 'Agent C', 'Agent D', 'Agent E'],
+                        datasets: [{
+                            label: 'Avg. Delivery Time (minutes)',
+                            data: [35, 42, 28, 55, 39],
+                            backgroundColor: accentMainColor, 
+                            borderColor: accentDarkColor, 
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: borderColor 
+                                },
+                                ticks: {
+                                    color: textSecondaryColor 
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: textSecondaryColor
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            function createReturnReasonsChart() {
+                const ctx = document.getElementById('returnReasonsChart');
+                if (!ctx) return;
+                if (Chart.getChart(ctx)) {
+                    Chart.getChart(ctx).destroy();
+                }
+                const primaryTextColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text-primary').trim();
+                const accentMainColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent-main').trim();
+                const accentDarkColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent-dark').trim();
+                const textSecondaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text-secondary').trim();
+
+
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Wrong Size', 'Damaged Item', 'Not as Described', 'Changed Mind', 'Other'],
+                        datasets: [{
+                            label: 'Return Reasons',
+                            data: [300, 150, 120, 80, 50],
+                            backgroundColor: [
+                                accentMainColor, 
+                                '#0891b2',
+                                '#f59e0b',
+                                '#f43f5e',
+                                '#64748b'
+                            ],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                         plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    color: textSecondaryColor 
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            const analyticsSection = document.getElementById('analytics');
+            const observerConfig = { attributes: true, attributeFilter: ['class'] };
+
+            const analyticsObserver = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.attributeName === 'class' && mutation.target.classList.contains('active')) {
+                        createAgentPerformanceChart();
+                        createReturnReasonsChart();
+                    }
+                });
+            });
+
+            if (analyticsSection) {
+                 analyticsObserver.observe(analyticsSection, observerConfig);
+                 if (analyticsSection.classList.contains('active')) {
+                    createAgentPerformanceChart();
+                    createReturnReasonsChart();
+                 }
+            }
+
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if (analyticsSection && analyticsSection.classList.contains('active')) { 
+                        createAgentPerformanceChart();
+                        createReturnReasonsChart();
+                    }
+                }, 250);
+            });
+
+            new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.attributeName === 'class' && mutation.target.classList.contains('dark')) {
+                        const currentAnalyticsSection = document.getElementById('analytics'); 
+                        if (currentAnalyticsSection && currentAnalyticsSection.classList.contains('active')) {
+                            createAgentPerformanceChart();
+                            createReturnReasonsChart();
+                        }
+                    } else if (mutation.attributeName === 'class' && !mutation.target.classList.contains('dark')) {
+                         const currentAnalyticsSection = document.getElementById('analytics'); 
+                        if (currentAnalyticsSection && currentAnalyticsSection.classList.contains('active')) {
+                            createAgentPerformanceChart();
+                            createReturnReasonsChart();
+                        }
+                    }
+                });
+            }).observe(document.documentElement, observerConfig);
+        });
+    </script>
+</body>
+</html>
